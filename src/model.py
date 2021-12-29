@@ -22,3 +22,21 @@ class FaceKeypointModel(nn.Module):
          x = self.dropout(x)
          out = self.fc1(x) 
          return out
+
+class FaceKeypointModelStage2(nn.Module):
+    def __init__(self):
+        super(FaceKeypointModelStage2, self).__init__()
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=2)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3)
+        self.fc1 = nn.Linear(32, 16) 
+        self.pool = nn.MaxPool2d(2, 2)
+        self.dropout = nn.Dropout2d(p=0.2)
+    def forward(self, x):
+         x = F.relu(self.conv1(x))
+         x = self.pool(x)
+         bs, _, _, _ = x.shape
+         x = F.adaptive_avg_pool2d(x, 1).reshape(bs, -1)
+         x = self.dropout(x)
+         out = self.fc1(x) 
+         return out
